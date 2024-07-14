@@ -17,11 +17,15 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Hello, world!');
 });
 
+
+
+const dbInstance = DatabaseConnection.getInstance();
+
 try {
-  const dbInstance = DatabaseConnection.getInstance();
-  app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
-    dbInstance.connectDb();
+  dbInstance.connectDb().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running at http://localhost:${PORT}`);
+    });
   });
 } catch (error) {
   if (error instanceof Error) {
