@@ -8,7 +8,11 @@ const sequelize = new Sequelize(
     dialect: "mysql",
     host: process.env.DATABASE_HOST,
     port: process.env.DATABASE_PORT,
+    dialectOptions: {
+      connectTimeout: 60000, // 60 seconds timeout
+    },
     ssl: true,
+    logging: false,
   }
 );
 
