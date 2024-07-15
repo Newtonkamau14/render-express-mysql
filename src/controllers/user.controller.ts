@@ -4,7 +4,7 @@ import { User } from "../models/user";
 const getAllUsers: RequestHandler = async (req: Request, res: Response) => {
   try {
     const users = await User.findAll({
-      attributes: ["firstName", "lastName", "email", "password"],
+      attributes: ["id", "firstName", "lastName", "email", "password"],
     });
 
     if (!users) {
@@ -22,7 +22,7 @@ const getUserById: RequestHandler = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const user = await User.findByPk(id, {
-      attributes: ["firstName", "lastName", "email", "password"],
+      attributes: ["id", "firstName", "lastName", "email", "password"],
     });
 
     if (!user) {
@@ -65,18 +65,18 @@ const updateUser: RequestHandler = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if(firstName !== undefined) {
-      userExists.firstName = firstName
+    if (firstName !== undefined) {
+      userExists.firstName = firstName;
     }
-    if(lastName !== undefined){
-      userExists.lastName = lastName
+    if (lastName !== undefined) {
+      userExists.lastName = lastName;
     }
-    if(email !== undefined ){
-      userExists.email = email
+    if (email !== undefined) {
+      userExists.email = email;
     }
 
-    if(password !== undefined) {
-      userExists.password = password
+    if (password !== undefined) {
+      userExists.password = password;
     }
 
     //Save for updated user
