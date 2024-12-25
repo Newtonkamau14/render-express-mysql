@@ -1,4 +1,5 @@
 import { Request, RequestHandler, Response } from "express";
+import QRCode from "qrcode";
 import { User } from "../models/user";
 
 const getAllUsers: RequestHandler = async (req: Request, res: Response) => {
@@ -108,4 +109,63 @@ const deleteUser: RequestHandler = async (req: Request, res: Response) => {
   }
 };
 
-export default { getAllUsers, getUserById, addUser, updateUser, deleteUser };
+const createUserQRCode: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const userExists = await User.findByPk(id, {
+      attributes: ["id", "email", "qrCode"],
+    });
+
+    if (!userExists) {
+      return res.status(404).json({ message: "No user found" });
+    }
+
+    if (userExists.qrCode) {
+      return res.status(409).json({ message: "QR Code already exists" });
+    }
+
+    const qrCodeImage = await QRCode.toDataURL(userExists.email);
+
+    userExists.qrCode = qrCodeImage;
+    await userExists.save();
+
+    return res.status(200).json({
+      message: "QR Code created successfully",
+    });
+  } catch (error) {
+    console.error("Error in creating qr code for user");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getUserQRCode: RequestHandler = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const qrCode = await User.findByPk(id, {
+      attributes: ["qrCode"],
+    });
+    if (!qrCode) {
+      return res.status(404).json({ message: "No QR code found" });
+    }
+
+    return res.status(200).json(qrCode);
+  } catch (error) {
+    console.error("Error in getting users qr code");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export default {
+  getAllUsers,
+  getUserById,
+  addUser,
+  updateUser,
+  deleteUser,
+  createUserQRCode,
+  getUserQRCode
+};

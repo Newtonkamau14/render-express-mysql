@@ -6,6 +6,7 @@ interface UserAttributes {
   firstName: string;
   lastName: string;
   email: string;
+  qrCode?: string;
   password: string;
   createdAt?: Date
 }
@@ -18,6 +19,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public firstName!: string;
   public lastName!: string;
   public email!: string;
+  public qrCode!: string;
   public password!: string;
   public createdAt!: Date
 
@@ -42,6 +44,10 @@ User.init(
     email: {
       type: DataTypes.STRING(50),
       allowNull: false,
+    },
+    qrCode: {
+      type: DataTypes.TEXT('long'),
+      allowNull: true
     },
     password: {
       type: DataTypes.STRING(255),
