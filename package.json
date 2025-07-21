@@ -19,7 +19,8 @@
     "mysql2": "^3.10.2",
     "qrcode": "^1.5.4",
     "sequelize": "^6.37.3",
-    "sequelize-typescript": "^2.1.6"
+    "sequelize-typescript": "^2.1.6",
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
