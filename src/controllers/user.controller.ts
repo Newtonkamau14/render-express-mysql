@@ -1,25 +1,33 @@
-import { Request, RequestHandler, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import QRCode from "qrcode";
 import { User } from "../models/user";
 
-const getAllUsers: RequestHandler = async (req: Request, res: Response) => {
+const getAllUsers: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const users = await User.findAll({
       attributes: ["id", "firstName", "lastName", "email", "password"],
     });
 
     if (!users) {
-      return res.status(404).json({ message: "No users found" });
+      res.status(404);
+      throw new Error("No users found");
     }
 
     return res.status(200).json({ users });
   } catch (error) {
-    console.error("Error in getting users", error);
-    return res.status(500).json({ message: "Internal server error" });
+    next(error);
   }
 };
 
-const getUserById: RequestHandler = async (req: Request, res: Response) => {
+const getUserById: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const user = await User.findByPk(id, {
@@ -27,17 +35,22 @@ const getUserById: RequestHandler = async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404);
+
+      throw new Error("User not found");
     }
 
     return res.status(200).json({ user });
   } catch (error) {
-    console.error("Error in getting user by ID", error);
-    return res.status(500).json({ message: "Internal server error" });
+    next(error);
   }
 };
 
-const addUser: RequestHandler = async (req: Request, res: Response) => {
+const addUser: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { firstName, lastName, email, password } = req.body;
 
@@ -50,12 +63,15 @@ const addUser: RequestHandler = async (req: Request, res: Response) => {
 
     return res.status(201).json({ message: "User created", user: newUser });
   } catch (error) {
-    console.error("Error in adding user", error);
-    return res.status(500).json({ message: "Internal server error" });
+    next(error);
   }
 };
 
-const updateUser: RequestHandler = async (req: Request, res: Response) => {
+const updateUser: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const { firstName, lastName, email, password } = req.body;
@@ -63,7 +79,8 @@ const updateUser: RequestHandler = async (req: Request, res: Response) => {
     const userExists = await User.findByPk(id);
 
     if (!userExists) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404);
+      throw new Error("User not found");
     }
 
     if (firstName !== undefined) {
@@ -85,33 +102,37 @@ const updateUser: RequestHandler = async (req: Request, res: Response) => {
 
     return res.status(200).json({ message: "User updated", userExists });
   } catch (error) {
-    console.error("Error in updating user", error);
-    return res.status(500).json({ message: "Internal server error" });
+    next(error);
   }
 };
 
-const deleteUser: RequestHandler = async (req: Request, res: Response) => {
+const deleteUser: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
 
     const user = await User.findByPk(id);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404);
+      throw new Error("User not found");
     }
 
     await user.destroy();
 
     return res.status(200).json({ message: "User deleted" });
   } catch (error) {
-    console.error("Error in deleting user", error);
-    return res.status(500).json({ message: "Internal server error" });
+    next(error);
   }
 };
 
 const createUserQRCode: RequestHandler = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
     const { id } = req.params;
@@ -121,11 +142,13 @@ const createUserQRCode: RequestHandler = async (
     });
 
     if (!userExists) {
-      return res.status(404).json({ message: "No user found" });
+      res.status(404);
+      throw new Error("No user found");
     }
 
     if (userExists.qrCode) {
-      return res.status(409).json({ message: "QR Code already exists" });
+      res.status(409);
+      throw new Error("QR Code already exists");
     }
 
     const qrCodeImage = await QRCode.toDataURL(userExists.email);
@@ -137,12 +160,15 @@ const createUserQRCode: RequestHandler = async (
       message: "QR Code created successfully",
     });
   } catch (error) {
-    console.error("Error in creating qr code for user");
-    return res.status(500).json({ message: "Internal server error" });
+    next(error);
   }
 };
 
-const getUserQRCode: RequestHandler = async (req: Request, res: Response) => {
+const getUserQRCode: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
 
@@ -150,13 +176,13 @@ const getUserQRCode: RequestHandler = async (req: Request, res: Response) => {
       attributes: ["qrCode"],
     });
     if (!qrCode) {
-      return res.status(404).json({ message: "No QR code found" });
+      res.status(404);
+      throw new Error("No QR code found");
     }
 
     return res.status(200).json(qrCode);
   } catch (error) {
-    console.error("Error in getting users qr code");
-    return res.status(500).json({ message: "Internal server error" });
+    next(error);
   }
 };
 
@@ -167,5 +193,5 @@ export default {
   updateUser,
   deleteUser,
   createUserQRCode,
-  getUserQRCode
+  getUserQRCode,
 };

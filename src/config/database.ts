@@ -1,18 +1,18 @@
 import { Sequelize } from "sequelize";
+import env from "../env";
 
 const sequelize = new Sequelize(
-  process.env.DATABASE_NAME,
-  process.env.DATABASE_USER,
-  process.env.DATABASE_PASSWORD,
+  env.DATABASE_NAME,
+  env.DATABASE_USER,
+  env.DATABASE_PASSWORD,
   {
     dialect: "mysql",
-    host: process.env.DATABASE_HOST,
-    port: process.env.DATABASE_PORT,
+    host: env.DATABASE_HOST,
+    port: env.DATABASE_PORT,
     dialectOptions: {
       connectTimeout: 60000, // 60 seconds timeout
     },
     ssl: true,
-    logging: false,
   }
 );
 
@@ -33,6 +33,8 @@ class DatabaseConnection {
     try {
       await sequelize.authenticate();
       console.log("Connection has been established successfully.");
+      // await sequelize.sync({alter:true})
+      // console.log("Tables created")
     } catch (error) {
       console.error("Unable to connect to the database:", error);
     }

@@ -1,5 +1,6 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import { sequelize } from "../config/database";
+import z from "zod";
 
 interface UserAttributes {
   id?: number;
@@ -15,13 +16,13 @@ interface UserAttributes {
 interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-  public id!: number;
-  public firstName!: string;
-  public lastName!: string;
-  public email!: string;
-  public qrCode!: string;
-  public password!: string;
-  public createdAt!: Date
+  declare id: number;
+  declare firstName: string;
+  declare lastName: string;
+  declare email: string;
+  declare qrCode: string;
+  declare password: string;
+  declare createdAt: Date
 
 }
 
@@ -66,5 +67,18 @@ User.init(
     freezeTableName: true,
   }
 );
+
+const UserSchema = z.object({
+  id: z.number().min(1).nonnegative(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string(),
+  qrCode: z.string(),
+  password: z.string(),
+  createdAt: z.date()
+
+})
+
+export type UserType =  z.infer<typeof UserSchema>
 
 export { User };
