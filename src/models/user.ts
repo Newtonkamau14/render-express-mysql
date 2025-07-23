@@ -68,17 +68,5 @@ User.init(
   }
 );
 
-const UserSchema = z.object({
-  id: z.number().min(1).nonnegative(),
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string(),
-  qrCode: z.string(),
-  password: z.string(),
-  createdAt: z.date()
-
-})
-
-export type UserType =  z.infer<typeof UserSchema>
 
 export { User };

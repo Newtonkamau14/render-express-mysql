@@ -11,7 +11,7 @@ router
 router
   .route("/add")
   .post(validateRequest(bodyValidator), userController.addUser);
-router.route("/update/:id").patch(validateRequest,userController.updateUser);
+router.route("/update/:id").patch(validateRequest(paramsValidator),validateRequest(bodyValidator),userController.updateUser);
 router.route("/delete/:id").delete(validateRequest(paramsValidator),userController.deleteUser);
 router.route("/add-qr/:id").post(validateRequest(paramsValidator),userController.createUserQRCode);
 router

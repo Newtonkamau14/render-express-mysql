@@ -13,7 +13,7 @@ export const bodyValidator = z.object({
 
 export const paramsValidator = z.object({
   params: z.object({
-    id: z.coerce.number(),
+    id: z.coerce.number("Invalid id!"),
   }),
 });
 

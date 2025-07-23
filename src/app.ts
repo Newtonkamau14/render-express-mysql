@@ -30,7 +30,7 @@ app.use(cors(options));
 app.use(express.urlencoded({ extended: false }));
 app.use(router);
 app.use(middlewares.notFound);
-app.use(middlewares.notFound);
+app.use(middlewares.errorHandler);
 
 
 export { app };

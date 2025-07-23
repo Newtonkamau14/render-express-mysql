@@ -1,10 +1,21 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import QRCode from "qrcode";
 import { User } from "../models/user";
+import {
+  CreateUserResponse,
+  GetUserQrCodeResponse,
+  GetUsersResponse,
+  GetUserWithIdResponse,
+  UpdateUserBody,
+  UpdateUserResponse,
+  UserId,
+  UserType,
+} from "../lib/types";
+import MessageResponse from "../interfaces/MessageResponse";
 
-const getAllUsers: RequestHandler = async (
+const getAllUsers = async (
   req: Request,
-  res: Response,
+  res: Response<GetUsersResponse>,
   next: NextFunction
 ) => {
   try {
@@ -23,9 +34,9 @@ const getAllUsers: RequestHandler = async (
   }
 };
 
-const getUserById: RequestHandler = async (
-  req: Request,
-  res: Response,
+const getUserById = async (
+  req: Request<UserId, GetUserWithIdResponse, {}>,
+  res: Response<GetUserWithIdResponse>,
   next: NextFunction
 ) => {
   try {
@@ -36,7 +47,6 @@ const getUserById: RequestHandler = async (
 
     if (!user) {
       res.status(404);
-
       throw new Error("User not found");
     }
 
@@ -46,9 +56,9 @@ const getUserById: RequestHandler = async (
   }
 };
 
-const addUser: RequestHandler = async (
-  req: Request,
-  res: Response,
+const addUser = async (
+  req: Request<{}, CreateUserResponse, UserType>,
+  res: Response<CreateUserResponse>,
   next: NextFunction
 ) => {
   try {
@@ -67,9 +77,9 @@ const addUser: RequestHandler = async (
   }
 };
 
-const updateUser: RequestHandler = async (
-  req: Request,
-  res: Response,
+const updateUser = async (
+  req: Request<UserId, UpdateUserResponse, UpdateUserBody>,
+  res: Response<UpdateUserResponse>,
   next: NextFunction
 ) => {
   try {
@@ -106,9 +116,9 @@ const updateUser: RequestHandler = async (
   }
 };
 
-const deleteUser: RequestHandler = async (
-  req: Request,
-  res: Response,
+const deleteUser = async (
+  req: Request<UserId, Readonly<MessageResponse>, {}>,
+  res: Response<Readonly<MessageResponse>>,
   next: NextFunction
 ) => {
   try {
@@ -129,9 +139,9 @@ const deleteUser: RequestHandler = async (
   }
 };
 
-const createUserQRCode: RequestHandler = async (
-  req: Request,
-  res: Response,
+const createUserQRCode = async (
+  req: Request<UserId, Readonly<MessageResponse>, {}>,
+  res: Response<Readonly<MessageResponse>>,
   next: NextFunction
 ) => {
   try {
@@ -164,23 +174,24 @@ const createUserQRCode: RequestHandler = async (
   }
 };
 
-const getUserQRCode: RequestHandler = async (
-  req: Request,
-  res: Response,
+const getUserQRCode = async (
+  req: Request<UserId, GetUserQrCodeResponse, {}>,
+  res: Response<GetUserQrCodeResponse>,
   next: NextFunction
 ) => {
   try {
     const { id } = req.params;
 
-    const qrCode = await User.findByPk(id, {
+    const userQrCode = await User.findByPk(id, {
       attributes: ["qrCode"],
     });
-    if (!qrCode) {
+    if (userQrCode?.qrCode === null) {
       res.status(404);
-      throw new Error("No QR code found");
+      throw new Error("No QR Code found");
     }
 
-    return res.status(200).json(qrCode);
+    let qrCode = userQrCode?.qrCode;
+    return res.status(200).json({ message: "QR code found", qrCode });
   } catch (error) {
     next(error);
   }
